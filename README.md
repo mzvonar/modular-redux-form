@@ -1,4 +1,4 @@
-modular-redux-form
+modular-redux-form [![Build Status](https://travis-ci.org/mzvonar/modular-redux-form.svg?branch=master)](https://travis-ci.org/mzvonar/modular-redux-form) [![Coverage Status](https://coveralls.io/repos/github/mzvonar/modular-redux-form/badge.svg?branch=master)](https://coveralls.io/github/mzvonar/modular-redux-form?branch=master) [![npm version](https://badge.fury.io/js/%40mzvonar%2Fmodular-redux-form.svg)](https://badge.fury.io/js/%40mzvonar%2Fmodular-redux-form)
 =========
 
 Modified version of [redux-form](https://github.com/erikras/redux-form) by erikras.  

@@ -53,12 +53,7 @@ const webpackConfig = {
         new CleanWebpackPlugin(['lib'], {
             verbose: true
         }),
-    ],
-    resolve: {
-        alias: {
-            joi: 'joi-browser'
-        }
-    }
+    ]
 };
 
 if(process.env.NODE_ENV !== 'production') {

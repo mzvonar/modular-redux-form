@@ -1,4 +1,9 @@
-import Joi from 'joi';
+let Joi;
+try {
+    Joi = require('joi');
+} catch (er) {
+    Joi = null;
+}
 
 const validators = {
     required: (newValue) => !!(newValue && ((typeof newValue !== 'string' && !Array.isArray(newValue)) || newValue.length !== 0)),
@@ -14,6 +19,10 @@ export function validateInput(input, value) {
         let validatorName;
 
         if(validationKey.isJoi) {
+            if(!Joi) {
+                throw new Error('Validator is Joi schema but Joi module was not found.');
+            }
+
             validator = validationKey;
             validatorName = validator._getLabel();
 
@@ -39,6 +48,10 @@ export function validateInput(input, value) {
             }
 
             if(validator.isJoi) {
+                if(!Joi) {
+                    throw new Error('Validator is Joi schema but Joi module was not found.');
+                }
+
                 const result = Joi.validate(value, validator);
 
                 if(!validatorName && process.env.NODE_ENV !== 'production') {
