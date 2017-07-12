@@ -23,6 +23,13 @@ var reactReduxExternal = {
     amd: 'react-redux'
 };
 
+var joiExternal = {
+    root: 'Joi',
+    commonjs2: 'joi',
+    commonjs: 'joi',
+    amd: 'joi'
+};
+
 const webpackConfig = {
     entry: [
         './src/index.js'
@@ -30,7 +37,8 @@ const webpackConfig = {
     externals: {
         react: reactExternal,
         redux: reduxExternal,
-        'react-redux': reactReduxExternal
+        'react-redux': reactReduxExternal,
+        joi: joiExternal
     },
     output: {
         path: require("path").resolve("./lib"),
