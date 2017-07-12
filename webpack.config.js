@@ -43,7 +43,7 @@ const webpackConfig = {
     output: {
         path: require("path").resolve("./lib"),
         filename: 'modular-redux-form.js',
-        library: '@mzvonar/modular-redux-form',
+        library: 'modular-redux-form',
         libraryTarget: 'umd'
     },
     module: {

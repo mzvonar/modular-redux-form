@@ -2,7 +2,7 @@
   "name": "@mzvonar/modular-redux-form",
   "version": "0.0.5",
   "description": "React form library",
-  "main": "index.js",
+  "main": "./lib/modular-redux-form.js",
   "scripts": {
     "test": "mocha \"src/**/__tests__/*\"",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec \"src/**/__tests__/*\"",
