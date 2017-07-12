@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha \"src/**/__tests__/*\"",
-    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec \"src/**/__tests__/*\"",
     "build": "node_modules/webpack/bin/webpack.js",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
