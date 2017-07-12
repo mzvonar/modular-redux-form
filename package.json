@@ -9,6 +9,11 @@
     "build": "node_modules/webpack/bin/webpack.js",
     "prepare": "npm run build"
   },
+  "files": [
+    "README.md",
+    "src",
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mzvonar/modular-redux-form.git"
