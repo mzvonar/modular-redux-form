@@ -1,0 +1,16 @@
+{
+  "presets": [
+    "es2015",
+    "react"
+  ],
+  "plugins": [
+    "transform-es2015-for-of"
+  ],
+  "env": {
+    "development": {
+        "plugins": [
+            "transform-react-jsx-source"
+        ]
+    }
+  }
+}
