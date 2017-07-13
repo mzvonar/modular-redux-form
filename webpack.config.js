@@ -1,6 +1,5 @@
 var path = require('path');
 var webpack = require('webpack');
-var CleanWebpackPlugin = require('clean-webpack-plugin');
 
 var reactExternal = {
     root: 'React',
@@ -31,9 +30,6 @@ var joiExternal = {
 };
 
 const webpackConfig = {
-    entry: [
-        './src/index.js'
-    ],
     externals: {
         react: reactExternal,
         redux: reduxExternal,
@@ -41,8 +37,6 @@ const webpackConfig = {
         joi: joiExternal
     },
     output: {
-        path: require("path").resolve("./lib"),
-        filename: 'modular-redux-form.js',
         library: '@mzvonar/modular-redux-form',
         libraryTarget: 'umd'
     },
@@ -58,10 +52,7 @@ const webpackConfig = {
     plugins: [
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-        }),
-        new CleanWebpackPlugin(['lib'], {
-            verbose: true
-        }),
+        })
     ]
 };
 
