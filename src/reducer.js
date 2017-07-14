@@ -117,7 +117,7 @@ function handleInputBlur(state, touch, name) {
 
     return mergeIn(state, ['inputs', name], {
         valid,
-        errors,
+        errors: errors.length > 0 ? errors : null,
         touched: touch ? true : input.touched
     });
 }
