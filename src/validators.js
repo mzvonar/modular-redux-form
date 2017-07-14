@@ -1,6 +1,6 @@
 let Joi;
 try {
-    Joi = require('joi');
+    Joi = require('joi-browser');
 } catch (er) {
     Joi = null;
 }
