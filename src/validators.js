@@ -21,7 +21,7 @@ export function setGlobalValidators(newValidators) {
     }
 }
 
-export function validateInput(input, value) {
+export function validateInput(input, value, allValues) {
     const errors = [];
 
     for(let i = 0, length = input.validate.length; i < length; i += 1) {
@@ -38,7 +38,9 @@ export function validateInput(input, value) {
             validator = validationKey;
             validatorName = validator._getLabel();
 
-            const result = Joi.validate(value, validator);
+            const result = Joi.validate(value, validator, {
+                context: allValues
+            });
 
             if(!validatorName && process.env.NODE_ENV !== 'production') {
                 console.warn('Unlabelled Joi schema.');
@@ -68,7 +70,9 @@ export function validateInput(input, value) {
                     throw new Error('Validator is Joi schema but Joi module was not found.');
                 }
 
-                const result = Joi.validate(value, validator);
+                const result = Joi.validate(value, validator, {
+                    context: allValues
+                });
 
                 if(!validatorName && process.env.NODE_ENV !== 'production') {
                     console.warn('Unlabelled Joi schema.');
@@ -79,7 +83,7 @@ export function validateInput(input, value) {
                     errors.push(validatorName);
                 }
             }
-            else if(!validator(value)) {
+            else if(!validator(value, allValues)) {
                 errors.push(validatorName);
             }
         }

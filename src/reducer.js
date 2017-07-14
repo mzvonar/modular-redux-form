@@ -63,10 +63,22 @@ function removeForm(state, form) {
     return newState;
 }
 
+function getAllValues(inputs) {
+    const values = {};
+
+    for(const key in inputs) {
+        if(Object.prototype.hasOwnProperty.call(inputs, key)) {
+            values[key] = inputs[key].value;
+        }
+    }
+
+    return values;
+}
+
 function registerInput(state, name, config, initialValue, initialErrors) {
     const input = getIn(state, ['inputs', name], createEmptyInputState(config, initialValue, initialErrors));
 
-    input.errors = validateInput(input, input.value);
+    input.errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
     input.valid = input.errors.length === 0;
 
     return setIn(state, ['inputs', name], input);
@@ -78,7 +90,7 @@ function handleInputChange(state, touch, name, value) {
     const input = getIn(state, ['inputs', name]);
 
     const newValue = (value === '' && input.initialValue === undefined) ? undefined : value;
-    const errors = validateInput(input, newValue);
+    const errors = validateInput(input, newValue, getAllValues(getIn(state, 'inputs')));
     const valid = !errors || errors.length === 0;
 
     return mergeIn(state, ['inputs', name], {
@@ -99,7 +111,7 @@ function handleInputBlur(state, touch, name) {
     let errors = input.errors || [];
 
     if(touch) {
-        errors = validateInput(input, input.value);
+        errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
         valid = errors.length === 0;
     }
 
