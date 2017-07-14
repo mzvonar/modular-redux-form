@@ -57,6 +57,7 @@
     "joi": "^10.6.0",
     "joi-browser": "10.6.1",
     "mocha": "3.4.2",
+    "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-redux": "5.0.5",

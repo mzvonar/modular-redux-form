@@ -1,6 +1,6 @@
 import React from 'react';
-import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import actions from './actions';
 import isEvent from './utils/isEvent';
@@ -280,7 +280,6 @@ const connectForm = initialConfig => {
                 removeInput: bindForm(actions.removeInput),
                 inputChange: bindForm(actions.inputChange).bind(null, config.touchOnChange),
                 inputBlur: bindForm(actions.inputBlur).bind(null, config.touchOnBlur),
-                //submit: bindForm(actions.submit),
                 submitting: bindForm(actions.submitting),
                 submitSuccess: bindForm(actions.submitSuccess),
                 submitErrorAction: bindForm(actions.submitError),
@@ -303,3 +302,16 @@ const connectForm = initialConfig => {
 };
 
 export default connectForm;
+
+export const propTypes = {
+    form: PropTypes.string,
+    pristine: PropTypes.bool,
+    dirty: PropTypes.bool,
+    valid: PropTypes.bool,
+    submitting: PropTypes.bool,
+    submitted: PropTypes.bool,
+    submitError: PropTypes.object,
+    submitSuccess: PropTypes.bool,
+    submitForm: PropTypes.func,
+    asyncValidation: PropTypes.func
+};

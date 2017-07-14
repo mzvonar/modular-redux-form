@@ -32,8 +32,21 @@ const createEmptyInputState = (config, initialValue) => {
     return state;
 };
 
-function registerForm(state, form, initialValues) {
-    return setIn(state, [form, 'initialValues'], initialValues);
+const createEmtpyState = (state) => Object.assign({
+    pristine: true,
+    valid: true,
+    submitting: false,
+    submitted: false,
+    submitSuccess: false,
+    asyncValidation: null,
+    initialValues: {},
+    submitError: null
+}, state);
+
+function registerForm(state, form, initialValues = {}) {
+    return setIn(state, [form], createEmtpyState({
+        initialValues
+    }));
 }
 
 function removeForm(state, form) {
@@ -204,18 +217,7 @@ function handleAsyncValidateFinished(state, name, errors) {
     return newState;
 }
 
-const createEmtpyState = () => ({
-    pristine: true,
-    valid: true,
-    submitting: false,
-    submitted: false,
-    submitSuccess: false,
-    asyncValidation: false,
-    initialValues: {},
-    submitError: null
-});
-
-const reducer = (state = createEmtpyState(), action) => {
+const reducer = (state, action) => {
     switch(action.type) {
         case constants.REGISTER_INPUT:
             return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue));
