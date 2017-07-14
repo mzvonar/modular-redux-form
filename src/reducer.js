@@ -12,16 +12,17 @@ const isMRFAction = action => (
     action.type.substring(0, prefix.length) === prefix
 );
 
-const createEmptyInputState = (config, initialValue) => {
+const createEmptyInputState = (config, initialValue, initialErrors) => {
     const state = {
         pristine: true,
         dirty: false,
         touched: false,
         valid: true,
-        errors: [],
+        errors: null,
         validate: config.validate || [],
         asyncValidation: false,
         asyncErrors: [],
+        initialErrors: initialErrors && (Object.keys(initialErrors).length > 0 ? initialErrors : null),
         value: initialValue
     };
 
@@ -32,20 +33,25 @@ const createEmptyInputState = (config, initialValue) => {
     return state;
 };
 
-const createEmtpyState = (state) => Object.assign({
+const createEmtpyFormState = (state) => Object.assign({
     pristine: true,
     valid: true,
+    touched: false,
     submitting: false,
     submitted: false,
     submitSuccess: false,
     asyncValidation: null,
     initialValues: {},
+    initialFormErrors: null,
+    initialInputErrors: null,
     submitError: null
 }, state);
 
-function registerForm(state, form, initialValues = {}) {
-    return setIn(state, [form], createEmtpyState({
-        initialValues
+function registerForm(state, form, config = {}) {
+    return setIn(state, [form], createEmtpyFormState({
+        initialValues: config.initialValues || {},
+        initialFormErrors: config.initialFormErrors && (config.initialFormErrors.length > 0 ? config.initialFormErrors : null),
+        initialInputErrors: config.initialInputErrors
     }));
 }
 
@@ -57,8 +63,8 @@ function removeForm(state, form) {
     return newState;
 }
 
-function registerInput(state, name, config, initialValue) {
-    const input = getIn(state, ['inputs', name], createEmptyInputState(config, initialValue));
+function registerInput(state, name, config, initialValue, initialErrors) {
+    const input = getIn(state, ['inputs', name], createEmptyInputState(config, initialValue, initialErrors));
 
     input.errors = validateInput(input, input.value);
     input.valid = input.errors.length === 0;
@@ -73,11 +79,11 @@ function handleInputChange(state, touch, name, value) {
 
     const newValue = (value === '' && input.initialValue === undefined) ? undefined : value;
     const errors = validateInput(input, newValue);
-    const valid = errors.length === 0;
+    const valid = !errors || errors.length === 0;
 
     return mergeIn(state, ['inputs', name], {
         valid,
-        errors,
+        errors: errors.length > 0 ? errors : null,
         pristine: false,
         dirty: true,
         touched: touch ? true : input.touched,
@@ -107,6 +113,7 @@ function handleInputBlur(state, touch, name) {
 function handleFormChange(state) {
     let valid = true;
     let pristine = true;
+    let touched = false;
 
     for(const key in state.inputs) {
         if(Object.prototype.hasOwnProperty.call(state.inputs, key)) {
@@ -118,12 +125,16 @@ function handleFormChange(state) {
             if(!input.pristine) {
                 pristine = false;
             }
+            if(input.touched) {
+                touched = true;
+            }
         }
     }
 
     return mergeIn(state, {
         valid,
-        pristine
+        pristine,
+        touched
     });
 }
 
@@ -220,7 +231,7 @@ function handleAsyncValidateFinished(state, name, errors) {
 const reducer = (state, action) => {
     switch(action.type) {
         case constants.REGISTER_INPUT:
-            return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue));
+            return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue, action.payload.initialErrors));
 
         case constants.INPUT_CHANGE:
             return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value));
@@ -254,7 +265,7 @@ const reducer = (state, action) => {
 const commonReducer = (state, action) => {
     switch(action.type) {
         case constants.REGISTER_FORM:
-            return registerForm(state, action.meta.form, action.payload.initialValues);
+            return registerForm(state, action.meta.form, action.payload);
 
         case constants.REMOVE_FORM:
             if(action.meta && action.meta.form) {

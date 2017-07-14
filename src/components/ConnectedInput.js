@@ -101,7 +101,7 @@ class Input extends React.Component {
         this.props._mrf.registerInput(this.props.name, {
             required: this.props.required,
             validate: this.props.validate
-        }, this.props.initialValue);
+        }, this.props.initialValue, this.props.initialErrors);
     }
 
     componentWillUnmount() {
@@ -164,7 +164,8 @@ class Input extends React.Component {
 
         if(typeof this.props.component === 'string') {
             return React.createElement(this.props.component, Object.assign(componentProps.input, {
-                type: this.props.type
+                type: this.props.type,
+                className: this.props.className
             }));
         }
         else {
@@ -176,6 +177,7 @@ class Input extends React.Component {
                     valid: this.props.input.valid,
                     errors: this.props.input.errors,
                     errorMessages: generateErrorMessages(this.props.input.errors, this.props.errors),
+                    initialErrors: this.props.input.initialErrors,
                     asyncValidation: this.props.input.asyncValidation,
                     asyncErrors: this.props.input.asyncErrors,
                     formSubmitted: formSubmitted
@@ -191,6 +193,7 @@ function mapStateToProps(state, ownProps) {
     return {
         input: getIn(formState, ['inputs', ownProps.name]) || {},
         initialValue: getIn(formState, ['initialValues', ownProps.name]),
+        initialErrors: getIn(formState, ['initialInputErrors', ownProps.name]),
         formSubmitted: getIn(formState, 'submitted', false)
     }
 }

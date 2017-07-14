@@ -1,14 +1,12 @@
 import constant from './../constants';
 
 export default {
-    registerForm: (form, initialValues) => ({
+    registerForm: (form, config) => ({
         type: constant.REGISTER_FORM,
         meta: {
             form
         },
-        payload: {
-            initialValues
-        }
+        payload: config
     }),
     removeForm: (form) => ({
         type: constant.REMOVE_FORM,
@@ -16,7 +14,7 @@ export default {
             form
         }
     }),
-    registerInput: (form, name, config, initialValue) => ({
+    registerInput: (form, name, config, initialValue, initialErrors) => ({
         type: constant.REGISTER_INPUT,
         meta: {
             form
@@ -24,7 +22,8 @@ export default {
         payload: {
             name,
             config,
-            initialValue
+            initialValue,
+            initialErrors
         }
     }),
     removeInput: (form, name) => ({

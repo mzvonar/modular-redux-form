@@ -118,7 +118,11 @@ const connectForm = initialConfig => {
             }
 
             componentWillMount() {
-                this.props.registerForm(config.initialValues || this.props.initialValues);
+                this.props.registerForm({
+                    initialValues: config.initialValues || this.props.initialValues,
+                    initialFormErrors: config.initialFormErrors || this.props.initialFormErrors,
+                    initialInputErrors: config.initialInputErrors || this.props.initialInputErrors
+                });
             }
 
             componentWillUnmount() {
@@ -240,11 +244,13 @@ const connectForm = initialConfig => {
                     pristine: this.props.formState.pristine,
                     dirty: this.props.formState.dirty,
                     valid: this.props.formState.valid,
+                    touched: this.props.formState.touched,
                     submitting: this.props.formState.submitting,
                     submitted: this.props.formState.submitted,
                     submitError: this.props.formState.submitError,
                     submitSuccess: this.props.formState.submitSuccess,
                     submitForm: this.submitForm,
+                    initialFormErrors: this.props.formState.initialFormErrors,
                     asyncValidation: this.props.formState.asyncValidation
                 });
             }
@@ -258,6 +264,11 @@ const connectForm = initialConfig => {
 
         function mapStateToProps(state, ownProps) {
             const form = config.form || ownProps.form;
+
+            if(!state.modularReduxForm) {
+                throw new Error('modularReduxForm is undefined in state. Maybe you forgot to include the reducer?');
+            }
+
             const formState = state.modularReduxForm[form];
 
             return {
@@ -308,10 +319,12 @@ export const propTypes = {
     pristine: PropTypes.bool,
     dirty: PropTypes.bool,
     valid: PropTypes.bool,
+    touched: PropTypes.bool,
     submitting: PropTypes.bool,
     submitted: PropTypes.bool,
     submitError: PropTypes.object,
     submitSuccess: PropTypes.bool,
     submitForm: PropTypes.func,
+    initialFormErrors: PropTypes.array,
     asyncValidation: PropTypes.func
 };
