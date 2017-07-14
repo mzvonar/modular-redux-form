@@ -9,6 +9,18 @@ const validators = {
     required: (newValue) => !!(newValue && ((typeof newValue !== 'string' && !Array.isArray(newValue)) || newValue.length !== 0)),
 };
 
+export function setGlobalValidators(newValidators) {
+    if(Object.prototype.toString.call(newValidators) !== '[object Object]') {
+        throw new Error(`Validators must be an object. ${Object.prototype.toString.call(newValidators)} was provided.`);
+    }
+
+    for(const key in newValidators) {
+        if(Object.prototype.hasOwnProperty.call(newValidators, key)) {
+            validators[key] = newValidators[key];
+        }
+    }
+}
+
 export function validateInput(input, value) {
     const errors = [];
 
@@ -45,6 +57,10 @@ export function validateInput(input, value) {
             else {
                 validator = validators[validationKey];
                 validatorName = validationKey;
+            }
+
+            if(!validator) {
+                throw new Error(`No validator provided for "${validationKey}"`);
             }
 
             if(validator.isJoi) {
