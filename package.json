@@ -38,10 +38,12 @@
     "url": "https://github.com/mzvonar/modular-redux-form/issues"
   },
   "homepage": "https://github.com/mzvonar/modular-redux-form#readme",
-  "devDependencies": {
+  "dependencies": {
     "@mzvonar/getin": "0.0.4",
     "@mzvonar/mergein": "0.0.2",
-    "@mzvonar/setin": "0.0.3",
+    "@mzvonar/setin": "0.0.3"
+  },
+  "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-core": "6.25.0",
     "babel-loader": "7.1.1",
