@@ -198,7 +198,7 @@ const connectForm = initialConfig => {
                                     }
 
                                     let error = e;
-                                    if(e.response && e.response.body) {
+                                    if(e && e.response && e.response.body) {
                                         error = e.response.body
                                     }
 
