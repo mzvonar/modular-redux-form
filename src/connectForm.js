@@ -323,7 +323,7 @@ export const propTypes = {
     submitting: PropTypes.bool,
     submitted: PropTypes.bool,
     submitError: PropTypes.bool,
-    submitErrorObject: PropTypes.object,
+    submitErrorMessages: PropTypes.array,
     submitSuccess: PropTypes.bool,
     submitForm: PropTypes.func,
     initialFormErrors: PropTypes.array,

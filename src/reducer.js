@@ -45,7 +45,7 @@ const createEmtpyFormState = (state) => Object.assign({
     initialFormErrors: null,
     initialInputErrors: null,
     submitError: false,
-    submitErrorObject: null
+    submitErrorMessages: null
 }, state);
 
 function registerForm(state, form, config = {}) {
@@ -169,12 +169,22 @@ function handleSubmitSuccess(state) {
 }
 
 function handleSubmitError(state, error) {
+    let errorMessages = null;
+
+    const errorType = Object.prototype.toString.call(error);
+    if(errorType === '[object String]') {
+        errorMessages = [error];
+    }
+    else if(errorType === '[object Array]') {
+        errorMessages = error;
+    }
+
     state = mergeIn(state, {
         submitting: false,
         submitted: true,
         submitSuccess: false,
         submitError: true,
-        submitErrorObject: error
+        submitErrorMessages: errorMessages
     });
 
     if(error && error.inputs) {
