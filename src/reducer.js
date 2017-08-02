@@ -80,7 +80,7 @@ function registerInput(state, name, config, initialValue, initialErrors) {
     const errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
 
     input.errors = errors.length > 0 ? errors : null;
-    input.valid = input.errors.length === 0;
+    input.valid = !errors || errors.length === 0;
 
     return setIn(state, ['inputs', name], input);
 }
