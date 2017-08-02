@@ -44,7 +44,8 @@ const createEmtpyFormState = (state) => Object.assign({
     initialValues: {},
     initialFormErrors: null,
     initialInputErrors: null,
-    submitError: null
+    submitError: false,
+    submitErrorObject: null
 }, state);
 
 function registerForm(state, form, config = {}) {
@@ -162,7 +163,8 @@ function handleSubmitSuccess(state) {
         submitted: true,
         submitSuccess: true,
         valid: true,
-        submitError: null
+        submitError: false,
+        submitErrorObject: null
     });
 }
 
@@ -171,7 +173,8 @@ function handleSubmitError(state, error) {
         submitting: false,
         submitted: true,
         submitSuccess: false,
-        submitError: error
+        submitError: true,
+        submitErrorObject: error
     });
 
     if(error && error.inputs) {
