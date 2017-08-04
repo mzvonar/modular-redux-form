@@ -100,7 +100,8 @@ class Input extends React.Component {
     componentWillMount() {
         this.props._mrf.registerInput(this.props.name, {
             required: this.props.required,
-            validate: this.props.validate
+            validate: this.props.validate,
+            value: (this.props.type === 'hidden' && this.props.value) ? this.props.value : undefined
         }, this.props.initialValue, this.props.initialErrors);
     }
 

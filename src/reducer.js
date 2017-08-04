@@ -23,7 +23,7 @@ const createEmptyInputState = (config, initialValue, initialErrors) => {
         asyncValidation: false,
         asyncErrors: [],
         initialErrors: initialErrors && (Object.keys(initialErrors).length > 0 ? initialErrors : null),
-        value: initialValue
+        value: typeof initialValue !== 'undefined' ? initialValue : config.value
     };
 
     if(config.required === true) {
