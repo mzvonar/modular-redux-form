@@ -29,7 +29,9 @@ function cleanComponentProps(props) {
         '_mrf',
         'input',
         'validate',
-        'formSubmitted'
+        'formSubmitted',
+        'readOnly',
+        'disabled'
     ]);
 
     const inputProps = {};
@@ -43,6 +45,9 @@ function cleanComponentProps(props) {
     else {
         inputProps.value = (input && input.value) || (!props.input.dirty ? props.initialValue : '') || '';
     }
+
+    inputProps.readOnly = props.readOnly;
+    inputProps.disabled = props.disabled;
 
     componentProps.input = inputProps;
 
