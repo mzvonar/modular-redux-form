@@ -179,29 +179,35 @@ function handleSubmitError(state, error) {
         errorMessages = error;
     }
 
-    state = mergeIn(state, {
-        submitting: false,
-        submitted: true,
-        submitSuccess: false,
-        submitError: true,
-        submitErrorMessages: errorMessages
-    });
-
+    let formValid = true;
     if(error && error.inputs) {
         for(const key in error.inputs) {
             if(Object.prototype.hasOwnProperty.call(error.inputs, key)) {
                 if(getIn(state, ['inputs', key])) {
                     let asyncErrors = error.inputs[key];
+                    formValid = false;
 
                     if(Object.prototype.toString.call(asyncErrors) !== '[object Array]') {
                         asyncErrors = [asyncErrors];
                     }
 
-                    state = setIn(state, ['inputs', key, 'asyncErrors'], asyncErrors);
+                    state = mergeIn(state, ['inputs', key], {
+                        asyncErrors: asyncErrors,
+                        valid: false
+                    });
                 }
             }
         }
     }
+
+    state = mergeIn(state, {
+        submitting: false,
+        submitted: true,
+        submitSuccess: false,
+        submitError: true,
+        submitErrorMessages: errorMessages,
+        valid: formValid
+    });
 
     return state;
 }
