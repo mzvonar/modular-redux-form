@@ -6,7 +6,7 @@ try {
 }
 
 const validators = {
-    required: (newValue) => !!(newValue && ((typeof newValue !== 'string' && !Array.isArray(newValue)) || newValue.length !== 0)),
+    required: (newValue) => !!( (newValue || newValue === 0) && ((typeof newValue !== 'string' && !Array.isArray(newValue)) || newValue.length !== 0)),
 };
 
 export function setGlobalValidators(newValidators) {

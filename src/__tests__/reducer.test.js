@@ -308,6 +308,25 @@ describe('reducer', () => {
             })
         });
 
+        it('should add required validator if config.required is true', () => {
+            const newState = reducer({
+                testForm: {}
+            }, {
+                type: constants.REGISTER_INPUT,
+                payload: {
+                    name: 'testInput',
+                    config: {
+                        required: true
+                    }
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput.validate).toEqual(['required']);
+        });
+
         it('should return invalid input if state has errors', () => {
             const newState = reducer({
                 testForm: {
@@ -386,6 +405,42 @@ describe('reducer', () => {
 
             expect(newState.testForm.inputs.testInput.touched).toBe(true);
             expect(newState.testForm.touched).toBe(true);
+        });
+
+        it('should add initialErrors if not empty', () => {
+            const newState = reducer({
+                testForm: {}
+            }, {
+                type: constants.REGISTER_INPUT,
+                payload: {
+                    name: 'testInput',
+                    config: {},
+                    initialErrors: ['error']
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput.initialErrors).toEqual(['error']);
+        });
+
+        it('should not add initialErrors if empty', () => {
+            const newState = reducer({
+                testForm: {}
+            }, {
+                type: constants.REGISTER_INPUT,
+                payload: {
+                    name: 'testInput',
+                    config: {},
+                    initialErrors: []
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput.initialErrors).toBe(null);
         });
     });
 
@@ -1046,17 +1101,6 @@ describe('reducer', () => {
             expect(oldState).not.toBe(newState);
         });
 
-        it('should return undefined if form state does not exist', () => {
-            const newState = reducer({}, {
-                type: constants.SUBMIT_SUCCESS,
-                meta: {
-                    form: 'testForm'
-                }
-            });
-
-            expect(newState.testForm).toBe(undefined);
-        });
-
         it('should return proper state', () => {
             const newState = reducer({
                 testForm: {
@@ -1198,6 +1242,351 @@ describe('reducer', () => {
             expect(newState.testForm.inputs.testInput.valid).toBe(true);
             expect(newState.testForm.inputs.testInput.asyncErrors).toBe(undefined);
             expect(newState.testForm.valid).toBe(true);
+        });
+    });
+
+    describe('ASYNC_VALIDATE_START', () => {
+        it('should not mutate state', () => {
+            const oldState = {
+                testForm: {}
+            };
+
+            const newState = reducer(oldState, {
+                type: constants.ASYNC_VALIDATE_START,
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(oldState).not.toBe(newState);
+        });
+
+        it('should set state.asyncValidation to true', () => {
+            const oldState = {
+                testForm: {}
+            };
+
+            const newState = reducer(oldState, {
+                type: constants.ASYNC_VALIDATE_START,
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.asyncValidation).toBe(true);
+        });
+
+        it('should set input state.asyncValidation to true', () => {
+            const oldState = {
+                testForm: {
+                    inputs: {
+                        testInput: {}
+                    }
+                }
+            };
+
+            const newState = reducer(oldState, {
+                type: constants.ASYNC_VALIDATE_START,
+                meta: {
+                    form: 'testForm',
+                    name: 'testInput'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput.asyncValidation).toBe(true);
+        });
+    });
+
+    describe('ASYNC_VALIDATE_FINISHED', () => {
+        it('should not mutate state', () => {
+            const oldState = {
+                testForm: {}
+            };
+
+            const newState = reducer(oldState, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(oldState).not.toBe(newState);
+        });
+
+        it('should set state.asyncValidation to false', () => {
+            const newState = reducer({
+                testForm: {
+                    asyncValidation: true
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.asyncValidation).toBe(false);
+        });
+
+        it('should set asyncErrors for every input that has error', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+
+                        },
+                        testInput2: {
+
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput1: 'error1',
+                    testInput2: 'error2'
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm).toEqual({
+                asyncValidation: false,
+                pristine: false,
+                touched: false,
+                valid: false,
+                inputs: {
+                    testInput1: {
+                        asyncValidation: false,
+                        asyncErrors: ['error1'],
+                        valid: false
+                    },
+                    testInput2: {
+                        asyncValidation: false,
+                        asyncErrors: ['error2'],
+                        valid: false
+                    }
+                }
+            });
+        });
+
+        it('should not set asyncErrors for inputs without error', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+
+                        },
+                        testInput2: {
+
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput1: 'error1'
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm).toEqual({
+                asyncValidation: false,
+                pristine: false,
+                touched: false,
+                valid: false,
+                inputs: {
+                    testInput1: {
+                        asyncValidation: false,
+                        asyncErrors: ['error1'],
+                        valid: false
+                    },
+                    testInput2: {}
+                }
+            });
+        });
+
+        it('should not set asyncErrors only for specified input', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+
+                        },
+                        testInput2: {
+
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput1: 'error1',
+                    testInput2: 'error2'
+                },
+                meta: {
+                    form: 'testForm',
+                    name: 'testInput2'
+                }
+            });
+
+            expect(newState.testForm).toEqual({
+                asyncValidation: false,
+                pristine: false,
+                touched: false,
+                valid: false,
+                inputs: {
+                    testInput1: {},
+                    testInput2: {
+                        asyncValidation: false,
+                        asyncErrors: ['error2'],
+                        valid: false
+                    }
+                }
+            });
+        });
+
+        it('should set string error as array', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput1: 'error1'
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput1.asyncErrors).toEqual(['error1']);
+        });
+
+        it('should set array of errors', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput1: ['error1', 'error2']
+                },
+                meta: {
+                    form: 'testForm'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput1.asyncErrors).toEqual(['error1', 'error2']);
+        });
+
+        it('should throw error if error is not string or array', () => {
+            expect(() => {
+                reducer({
+                    testForm: {
+                        inputs: {
+                            testInput1: {
+
+                            }
+                        }
+                    }
+                }, {
+                    type: constants.ASYNC_VALIDATE_FINISHED,
+                    payload: {
+                        testInput1: {
+                            error1: true
+                        }
+                    },
+                    meta: {
+                        form: 'testForm'
+                    }
+                });
+            }).toThrow('Errors should be of type string or array. object was given');
+        });
+
+        it('should set asyncErrors to empty array if no error for specified input', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+
+                        },
+                        testInput2: {
+
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput2: 'error1'
+                },
+                meta: {
+                    form: 'testForm',
+                    name: 'testInput1'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput1.asyncErrors).toEqual([]);
+        });
+
+        it('should set input as invalid if it has async errors', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+                            valid: true
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput1: 'error1'
+                },
+                meta: {
+                    form: 'testForm',
+                    name: 'testInput1'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput1.valid).toBe(false);
+        });
+
+        it('should keep inputs validity if no async errors', () => {
+            const newState = reducer({
+                testForm: {
+                    inputs: {
+                        testInput1: {
+                            valid: false
+                        }
+                    }
+                }
+            }, {
+                type: constants.ASYNC_VALIDATE_FINISHED,
+                payload: {
+                    testInput2: 'error1'
+                },
+                meta: {
+                    form: 'testForm',
+                    name: 'testInput1'
+                }
+            });
+
+            expect(newState.testForm.inputs.testInput1.valid).toBe(false);
         });
     });
 });

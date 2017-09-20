@@ -68,6 +68,7 @@ function getAllValues(inputs) {
     const values = {};
 
     for(const key in inputs) {
+        /* istanbul ignore else */
         if(Object.prototype.hasOwnProperty.call(inputs, key)) {
             values[key] = inputs[key].value;
         }
@@ -130,6 +131,7 @@ function handleFormChange(state) {
     let touched = false;
 
     for(const key in state.inputs) {
+        /* istanbul ignore else */
         if(Object.prototype.hasOwnProperty.call(state.inputs, key)) {
             const input = state.inputs[key];
 
@@ -154,9 +156,10 @@ function handleFormChange(state) {
 
 function handleSubmitSuccess(state) {
     // In case form is already removed
-    if(!state) {
-        return state;
-    }
+    /* istanbul ignore else */
+    //if(!state) {
+    //    return state;
+    //}
 
     return mergeIn(state, {
         submitting: false,
@@ -182,11 +185,14 @@ function handleSubmitError(state, error) {
     let formValid = true;
     if(error && error.inputs) {
         for(const key in error.inputs) {
+            /* istanbul ignore else */
             if(Object.prototype.hasOwnProperty.call(error.inputs, key)) {
+                /* istanbul ignore else */
                 if(getIn(state, ['inputs', key])) {
                     let asyncErrors = error.inputs[key];
                     formValid = false;
 
+                    /* istanbul ignore else */
                     if(Object.prototype.toString.call(asyncErrors) !== '[object Array]') {
                         asyncErrors = [asyncErrors];
                     }
@@ -233,6 +239,7 @@ function handleAsyncValidateFinished(state, name, errors) {
         }
 
         for(const key in errors) {
+            /* istanbul ignore else */
             if(Object.prototype.hasOwnProperty.call(errors, key) && getIn(newState, ['inputs', key])) {
                 let inputErrors = errors[key];
                 if(inputErrors) {
