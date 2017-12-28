@@ -5,7 +5,7 @@
   "main": "./lib/modular-redux-form.js",
   "module": "./es/index.js",
   "scripts": {
-    "test": "mocha \"src/**/__tests__/*\"",
+    "test": "jest --watchAll",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec \"src/**/__tests__/*\"",
     "clean": "rm -rf lib && rm -rf dist",
     "build": "npm run build:es && npm run build:lib && npm run build:umd && npm run build:umd:min",
@@ -56,6 +56,7 @@
     "deep-equal": "1.0.1",
     "expect": "1.20.2",
     "istanbul": "0.4.5",
+    "jest": "21.1.0",
     "joi": "^10.6.0",
     "joi-browser": "10.6.1",
     "mocha": "3.4.2",
@@ -70,5 +71,15 @@
     "react": "^15.0.0",
     "react-redux": "^4.3.0 || ^5.0.0",
     "redux": "^3.0.0"
+  },
+  "jest": {
+    "automock": true,
+    "collectCoverage": true,
+    "coverageDirectory": "public/coverage",
+    "coverageReporters": [
+      "text",
+      "html"
+    ],
+    "mapCoverage": true
   }
 }
