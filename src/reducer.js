@@ -289,7 +289,7 @@ const reducer = (state, action) => {
             return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue, action.payload.initialErrors));
 
         case constants.INPUT_CHANGE:
-            return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value));
+            return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value), action.meta.touch);
 
         case constants.INPUT_BLUR:
             return handleFormChange(handleInputBlur(state, action.meta.touch, action.meta.name), true);
