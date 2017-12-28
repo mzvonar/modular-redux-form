@@ -92,12 +92,12 @@ function handleInputChange(state, touch, name, value) {
     const input = getIn(state, ['inputs', name]);
 
     const newValue = (value === '' && input.initialValue === undefined) ? undefined : value;
-    const errors = validateInput(input, newValue, getAllValues(getIn(state, 'inputs')));
-    const valid = !errors || errors.length === 0;
+    // const errors = validateInput(input, newValue, getAllValues(getIn(state, 'inputs')));
+    // const valid = !errors || errors.length === 0;
 
     return mergeIn(state, ['inputs', name], {
-        valid,
-        errors: errors.length > 0 ? errors : null,
+        // valid,
+        // errors: errors.length > 0 ? errors : null,
         pristine: false,
         dirty: true,
         touched: touch ? true : input.touched,
@@ -112,20 +112,20 @@ function handleInputBlur(state, touch, name) {
     let valid = input.valid;
     let errors = input.errors || [];
 
-    if(touch) {
-        errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
-        valid = errors.length === 0;
-    }
+    // if(touch) {
+    //     errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
+    //     valid = errors.length === 0;
+    // }
 
     return mergeIn(state, ['inputs', name], {
         valid,
-        errors: errors.length > 0 ? errors : null,
+        // errors: errors.length > 0 ? errors : null,
         touched: touch ? true : input.touched
     });
 }
 
-function handleFormChange(state) {
-    let valid = true;
+function handleFormChange(state, validate) {
+    let formValid = true;
     let pristine = true;
     let touched = false;
 
@@ -133,9 +133,25 @@ function handleFormChange(state) {
         if(Object.prototype.hasOwnProperty.call(state.inputs, key)) {
             const input = state.inputs[key];
 
-            if(!input.valid) {
-                valid = false;
+            let valid;
+            if(validate) {
+                const errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
+                valid = errors.length === 0;
+
+                state = mergeIn(state, ['inputs', key], {
+                    valid: valid,
+                    errors: errors.length > 0 ? errors : null,
+                });
             }
+            else {
+                valid = input.valid;
+            }
+
+
+            if(!valid) {
+                formValid = false;
+            }
+
             if(!input.pristine) {
                 pristine = false;
             }
@@ -146,7 +162,7 @@ function handleFormChange(state) {
     }
 
     return mergeIn(state, {
-        valid,
+        valid: formValid,
         pristine,
         touched
     });
@@ -179,7 +195,7 @@ function handleSubmitError(state, error) {
         errorMessages = error;
     }
 
-    let formValid = true;
+    let formValid = state.valid;
     if(error && error.inputs) {
         for(const key in error.inputs) {
             if(Object.prototype.hasOwnProperty.call(error.inputs, key)) {
@@ -269,7 +285,7 @@ const reducer = (state, action) => {
             return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value));
 
         case constants.INPUT_BLUR:
-            return handleFormChange(handleInputBlur(state, action.meta.touch, action.meta.name));
+            return handleFormChange(handleInputBlur(state, action.meta.touch, action.meta.name), true);
 
         case constants.SUBMITTING:
             return mergeIn(state, {
