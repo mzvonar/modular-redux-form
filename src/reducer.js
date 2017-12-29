@@ -93,12 +93,13 @@ function handleInputChange(state, touch, name, value) {
     const input = getIn(state, ['inputs', name]);
 
     const newValue = (value === '' && input.initialValue === undefined) ? undefined : value;
-    // const errors = validateInput(input, newValue, getAllValues(getIn(state, 'inputs')));
-    // const valid = !errors || errors.length === 0;
+
+    const errors = validateInput(input, newValue, getAllValues(getIn(state, 'inputs')));
+    const valid = !errors || errors.length === 0;
 
     return mergeIn(state, ['inputs', name], {
-        // valid,
-        // errors: errors.length > 0 ? errors : null,
+        valid,
+        errors: errors.length > 0 ? errors : null,
         pristine: false,
         dirty: true,
         touched: touch ? true : input.touched,
@@ -113,14 +114,14 @@ function handleInputBlur(state, touch, name) {
     let valid = input.valid;
     let errors = input.errors || [];
 
-    // if(touch) {
-    //     errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
-    //     valid = errors.length === 0;
-    // }
+    if(touch) {
+        errors = validateInput(input, input.value, getAllValues(getIn(state, 'inputs')));
+        valid = errors.length === 0;
+    }
 
     return mergeIn(state, ['inputs', name], {
         valid,
-        // errors: errors.length > 0 ? errors : null,
+        errors: errors.length > 0 ? errors : null,
         touched: touch ? true : input.touched
     });
 }
@@ -289,7 +290,7 @@ const reducer = (state, action) => {
             return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue, action.payload.initialErrors));
 
         case constants.INPUT_CHANGE:
-            return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value), action.meta.touch);
+            return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value), action.meta.touch || !getIn(state, ['inputs', action.meta.name, 'valid']));
 
         case constants.INPUT_BLUR:
             return handleFormChange(handleInputBlur(state, action.meta.touch, action.meta.name), true);
