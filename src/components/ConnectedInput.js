@@ -46,8 +46,10 @@ function cleanComponentProps(props) {
         inputProps.value = (input && input.value) || (!props.input.dirty ? props.initialValue : '') || '';
     }
 
+    inputProps.id = props.id;
     inputProps.readOnly = props.readOnly;
     inputProps.disabled = props.disabled;
+    inputProps.autoComplete = props.autoComplete;
 
     componentProps.input = inputProps;
 
