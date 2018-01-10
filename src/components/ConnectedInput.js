@@ -50,6 +50,7 @@ function cleanComponentProps(props) {
     inputProps.readOnly = props.readOnly;
     inputProps.disabled = props.disabled;
     inputProps.autoComplete = props.autoComplete;
+    inputProps.maxLength = props.maxLength;
 
     componentProps.input = inputProps;
 
