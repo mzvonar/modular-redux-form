@@ -38,13 +38,23 @@ export function validateInput(input, value, allValues) {
             validator = validationKey;
             validatorName = validator._getLabel();
 
-            const result = Joi.validate(value, validator, {
-                context: allValues
-            });
-
             if(!validatorName && process.env.NODE_ENV !== 'production') {
                 console.warn('Unlabelled Joi schema.');
                 validatorName = 'UnlabeledJoiSchema';
+            }
+
+            let result;
+            try {
+                result = Joi.validate(value, validator, {
+                    context: allValues
+                });
+            }
+            catch(e) {
+                console.error(e);
+
+                result = {
+                    error: true
+                };
             }
 
             if(result.error) {
@@ -70,21 +80,44 @@ export function validateInput(input, value, allValues) {
                     throw new Error('Validator is Joi schema but Joi module was not found.');
                 }
 
-                const result = Joi.validate(value, validator, {
-                    context: allValues
-                });
-
                 if(!validatorName && process.env.NODE_ENV !== 'production') {
                     console.warn('Unlabelled Joi schema.');
                     validatorName = 'UnlabeledJoiSchema';
+                }
+
+                let result;
+
+                try {
+                    result = Joi.validate(value, validator, {
+                        context: allValues
+                    });
+                }
+                catch(e) {
+                    console.error(e);
+
+                    result = {
+                        error: true
+                    };
                 }
 
                 if(result.error) {
                     errors.push(validatorName);
                 }
             }
-            else if(!validator(value, allValues)) {
-                errors.push(validatorName);
+            else {
+                let valid = false;
+
+                try {
+                    valid = validator(value, allValues)
+                }
+                catch(e) {
+                    console.error(e);
+                    valid = false;
+                }
+
+                if(!valid) {
+                    errors.push(validatorName);
+                }
             }
         }
     }
