@@ -26,33 +26,18 @@ function cleanComponentProps(props) {
 
     deleteChildren(componentProps, [
         'component',
-        '_mrf',
         'input',
-        'validate',
-        'formSubmitted',
-        'readOnly',
-        'disabled'
+        '_mrf',
     ]);
 
-    const inputProps = {};
-
-    if(componentProps.type === 'radio') {
-        inputProps.checked = input.value === componentProps.value;
-    }
-    else if(componentProps.type === 'checkbox') {
-        inputProps.checked = !!input.value;
-    }
-    else {
-        inputProps.value = (input && input.value) || (!props.input.dirty ? props.initialValue : '') || '';
+    const items = [];
+    if(input.items) {
+        for(let i = 0, length = input.items.length; i < length; i += 1) {
+            items.push(`${input.name}[${i}]`);
+        }
     }
 
-    inputProps.id = props.id;
-    inputProps.readOnly = props.readOnly;
-    inputProps.disabled = props.disabled;
-    inputProps.autoComplete = props.autoComplete;
-    inputProps.maxLength = props.maxLength;
-
-    componentProps.input = inputProps;
+    componentProps.items = items;
 
     return componentProps;
 }
@@ -84,7 +69,7 @@ const ignoreForUpdate = [
     '_mrf'
 ];
 
-class Input extends React.Component {
+class ConnectedArray extends React.Component {
     static get propTypes() {
         return {
             component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
@@ -92,21 +77,14 @@ class Input extends React.Component {
         }
     }
 
-    static get defaultProps() {
-        return {
-            component: 'input',
-        }
-    }
-
     constructor(props, context) {
         super(props, context);
-
-        this.onChange = this.onChange.bind(this);
-        this.onBlur = this.onBlur.bind(this);
     }
 
     componentWillMount() {
+        console.log("this.props.initialValue: ", this.props.initialValue);
         this.props._mrf.registerInput(this.props.name, {
+            isArray: true,
             required: this.props.required,
             validate: this.props.validate,
             value: (this.props.type === 'hidden' && this.props.value) ? this.props.value : undefined
@@ -165,17 +143,19 @@ class Input extends React.Component {
     render() {
         const formSubmitted = this.props.formSubmitted;
         let componentProps = cleanComponentProps(this.props);
-        Object.assign(componentProps.input, {
-            onChange: this.onChange,
-            onBlur: this.onBlur,
-        });
+        // Object.assign(componentProps.input, {
+        //     onChange: this.onChange,
+        //     onBlur: this.onBlur,
+        // });
 
 
-        if(typeof this.props.component === 'string') {
-            return React.createElement(this.props.component, Object.assign(componentProps.input, {
-                type: this.props.type,
-                className: this.props.className
-            }));
+        if(Object.prototype.toString.call(this.props.component) !== '[object Function]') {
+            // return React.createElement(this.props.component, Object.assign(componentProps.input, {
+            //     type: this.props.type,
+            //     className: this.props.className
+            // }));
+
+            throw new Error('Component must be a fucntion or class');
         }
         else {
             return React.createElement(this.props.component, Object.assign(componentProps, {
@@ -201,7 +181,7 @@ function mapStateToProps(state, ownProps) {
 
     return {
         input: getIn(formState, ['inputs', ownProps.name]) || {},
-        initialValue: getIn(formState, ['initialValues', ...ownProps._mrf.getPath(ownProps.name)]),
+        initialValue: getIn(formState, ['initialValues', ...ownProps.name.split('.')]),
         initialErrors: getIn(formState, ['initialInputErrors', ownProps.name]),
         formSubmitted: getIn(formState, 'submitted', false)
     }
@@ -209,4 +189,4 @@ function mapStateToProps(state, ownProps) {
 
 const mapDispatchToProps = {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Input);
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectedArray);

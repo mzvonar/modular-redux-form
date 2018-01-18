@@ -4,6 +4,8 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import actions from './actions';
 import isEvent from './utils/isEvent';
+import getPath from './utils/getPath';
+import getFormValues from './utils/getFormValues';
 
 function isPromise(obj) {
     return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
@@ -52,20 +54,6 @@ function validateFrom(formState) {
     return hasError;
 }
 
-function getFormValues(formState) {
-    const data = {};
-
-    if(formState) {
-        for(const key in formState.inputs) {
-            if(Object.prototype.hasOwnProperty.call(formState.inputs, key)) {
-                data[key] = formState.inputs[key].value;
-            }
-        }
-    }
-
-    return data;
-}
-
 const connectForm = initialConfig => {
     const config = Object.assign({
         touchOnBlur: true,
@@ -87,7 +75,9 @@ const connectForm = initialConfig => {
                         registerInput: PropTypes.func,
                         inputChange: PropTypes.func,
                         inputBlur: PropTypes.func,
-                        asyncValidate: PropTypes.func
+                        asyncValidate: PropTypes.func,
+                        getPath: PropTypes.func,
+                        arrayPush: PropTypes.func
                     })
                 }
             }
@@ -100,7 +90,9 @@ const connectForm = initialConfig => {
                         removeInput: this.props.removeInput,
                         inputChange: this.props.inputChange,
                         inputBlur: this.props.inputBlur,
-                        asyncValidate: this.asyncValidate
+                        asyncValidate: this.asyncValidate,
+                        getPath: getPath,
+                        arrayPush: this.props.arrayPush
                     }
                 }
             }
@@ -296,7 +288,8 @@ const connectForm = initialConfig => {
                 submitSuccess: bindForm(actions.submitSuccess),
                 submitErrorAction: bindForm(actions.submitError),
                 asyncValidateStart: bindForm(actions.asyncValidateStart),
-                asyncValidateFinished: bindForm(actions.asyncValidateFinished)
+                asyncValidateFinished: bindForm(actions.asyncValidateFinished),
+                arrayPush: bindForm(actions.arrayPush)
             }, dispatch);
 
         };

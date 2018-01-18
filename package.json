@@ -41,7 +41,7 @@
   "dependencies": {
     "@mzvonar/getin": "0.0.4",
     "@mzvonar/mergein": "0.0.2",
-    "@mzvonar/setin": "0.0.3"
+    "@mzvonar/setin": "0.0.11"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",

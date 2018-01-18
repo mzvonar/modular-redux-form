@@ -87,5 +87,39 @@ export default {
             name
         },
         payload: errors
-    })
+    }),
+    arrayPush: (form, name, value) => ({
+        type: constant.ARRAY_PUSH,
+        meta: {
+            form,
+            name
+        },
+        payload: {
+            value
+        }
+    }),
+    arrayPop: (form, name) => ({
+        type: constant.ARRAY_POP,
+        meta: {
+            form,
+            name
+        }
+    }),
+    arrayShift: (form, name) => ({
+        type: constant.ARRAY_SHIFT,
+        meta: {
+            form,
+            name
+        }
+    }),
+    arrayUnshift: (form, name, value) => ({
+        type: constant.ARRAY_UNSHIFT,
+        meta: {
+            form,
+            name
+        },
+        payload: {
+            value
+        }
+    }),
 };
