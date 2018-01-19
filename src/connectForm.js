@@ -5,18 +5,17 @@ import {connect} from 'react-redux';
 import actions from './actions';
 import isEvent from './utils/isEvent';
 import getPath from './utils/getPath';
-import getFormValues from './utils/getFormValues';
 
 function isPromise(obj) {
     return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
 }
 
 const silenceEvent = event => {
-    const is = isEvent(event)
+    const is = isEvent(event);
     if (is) {
-        event.preventDefault()
+        event.preventDefault();
     }
-    return is
+    return is;
 };
 
 function checkHasError(formState) {
@@ -77,7 +76,13 @@ const connectForm = initialConfig => {
                         inputBlur: PropTypes.func,
                         asyncValidate: PropTypes.func,
                         getPath: PropTypes.func,
-                        arrayPush: PropTypes.func
+                        arrayPush: PropTypes.func,
+                        arrayPop: PropTypes.func,
+                        arrayShift: PropTypes.func,
+                        arrayUnshift: PropTypes.func,
+                        arrayInsert: PropTypes.func,
+                        arrayRemove: PropTypes.func,
+                        arrayRemoveAll: PropTypes.func
                     })
                 }
             }
@@ -92,7 +97,13 @@ const connectForm = initialConfig => {
                         inputBlur: this.props.inputBlur,
                         asyncValidate: this.asyncValidate,
                         getPath: getPath,
-                        arrayPush: this.props.arrayPush
+                        arrayPush: this.props.arrayPush,
+                        arrayPop: this.props.arrayPop,
+                        arrayShift: this.props.arrayShift,
+                        arrayUnshift: this.props.arrayUnshift,
+                        arrayInsert: this.props.arrayInsert,
+                        arrayRemove: this.props.arrayRemove,
+                        arrayRemoveAll: this.props.arrayRemoveAll
                     }
                 }
             }
@@ -128,7 +139,7 @@ const connectForm = initialConfig => {
                     const checkName = (inputNames, name) => inputNames && inputNames.indexOf(name) > -1;
 
                     if(submitting || (blur && checkName(this.props.asyncBlurInputs, name)) || (change && checkName(this.props.asyncChangeInputs, name)) ) {
-                        const values = getFormValues(this.props.formState);
+                        const values = this.props.formState.values;
 
 
                         this.props.asyncValidateStart(name);
@@ -173,7 +184,7 @@ const connectForm = initialConfig => {
 
                 if(this.props.formState.valid) {
                     const doSubmit = () => {
-                        const data = getFormValues(this.props.formState);
+                        const data = this.props.formState.values;
 
                         const result = onSubmit(data);
 
@@ -289,7 +300,13 @@ const connectForm = initialConfig => {
                 submitErrorAction: bindForm(actions.submitError),
                 asyncValidateStart: bindForm(actions.asyncValidateStart),
                 asyncValidateFinished: bindForm(actions.asyncValidateFinished),
-                arrayPush: bindForm(actions.arrayPush)
+                arrayPush: bindForm(actions.arrayPush),
+                arrayPop: bindForm(actions.arrayPop),
+                arrayShift: bindForm(actions.arrayShift),
+                arrayUnshift: bindForm(actions.arrayUnshift),
+                arrayInsert: bindForm(actions.arrayInsert),
+                arrayRemove: bindForm(actions.arrayRemove),
+                arrayRemoveAll: bindForm(actions.arrayRemoveAll)
             }, dispatch);
 
         };

@@ -11,7 +11,10 @@ const formActions = {
     arrayPush: actions.arrayPush,
     arrayPop: actions.arrayPop,
     arrayShift: actions.arrayShift,
-    arrayUnshift: actions.arrayUnshift
+    arrayUnshift: actions.arrayUnshift,
+    arrayInsert: actions.arrayInsert,
+    arrayRemove: actions.arrayRemove,
+    arrayRemoveAll: actions.arrayRemoveAll
 };
 
 export {

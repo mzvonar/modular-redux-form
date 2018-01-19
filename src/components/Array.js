@@ -15,7 +15,14 @@ class Array extends React.Component {
             _mrf: PropTypes.shape({
                 getFormState: PropTypes.func.isRequired,
                 registerInput: PropTypes.func.isRequired,
-                removeInput: PropTypes.func.isRequired
+                removeInput: PropTypes.func.isRequired,
+                arrayPush: PropTypes.func.isRequired,
+                arrayPop: PropTypes.func.isRequired,
+                arrayShift: PropTypes.func.isRequired,
+                arrayUnshift: PropTypes.func.isRequired,
+                arrayInsert: PropTypes.func.isRequired,
+                arrayRemove: PropTypes.func.isRequired,
+                arrayRemoveAll: PropTypes.func.isRequired
             })
         }
     }

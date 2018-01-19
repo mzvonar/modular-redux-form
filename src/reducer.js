@@ -1,5 +1,4 @@
 import reducerUtils from './utils/reducerUtils';
-import getFormValues from './utils/getFormValues';
 import constants, {prefix} from './constants';
 import getIn from '@mzvonar/getin';
 import setIn from '@mzvonar/setin';
@@ -14,7 +13,7 @@ const isMRFAction = action => (
     action.type.substring(0, prefix.length) === prefix
 );
 
-const createEmptyInputState = (name, config, initialValue, initialErrors) => {
+const createEmptyInputState = (name, config, initialErrors) => {
     let validate = config.validate || [];
 
     const validateType = Object.prototype.toString.call(validate);
@@ -39,20 +38,6 @@ const createEmptyInputState = (name, config, initialValue, initialErrors) => {
         initialErrors: initialErrors && (Object.keys(initialErrors).length > 0 ? initialErrors : null)
     };
 
-    if(!config.isArray) {
-        state.value= typeof initialValue !== 'undefined' ? initialValue : config.value;
-    }
-
-    if(config.isArray) {
-        state.items = initialValue || [];
-
-        // if(initialValue && initialValue.length > 0) {
-        //     for(let i = 0, length = initialValue.length; i < length; i += 1) {
-        //         state.items.push(`${name}[${i}]`);
-        //     }
-        // }
-    }
-
     if(config.required === true) {
         state.validate.unshift('required');
     }
@@ -68,6 +53,7 @@ const createEmptyFormState = (state) => Object.assign({
     submitted: false,
     submitSuccess: false,
     asyncValidation: null,
+    values: {},
     initialValues: {},
     initialFormErrors: null,
     initialInputErrors: null,
@@ -77,6 +63,7 @@ const createEmptyFormState = (state) => Object.assign({
 
 function registerForm(state, form, config = {}) {
     return setIn(state, [form], createEmptyFormState({
+        values: config.initialValues || {},
         initialValues: config.initialValues || {},
         initialFormErrors: config.initialFormErrors && (config.initialFormErrors.length > 0 ? config.initialFormErrors : null),
         initialInputErrors: config.initialInputErrors
@@ -91,42 +78,29 @@ function removeForm(state, form) {
     return newState;
 }
 
-function getAllValues(inputs) {
-    const values = {};
-
-    for(const key in inputs) {
-        /* istanbul ignore else */
-        if(Object.prototype.hasOwnProperty.call(inputs, key)) {
-            values[key] = inputs[key].value;
-        }
-    }
-
-    return values;
+function getValue(state, name) {
+    return getIn(state, ['values', ...getPath(name)]);
 }
 
-function registerInput(state, name, config, initialValue, initialErrors) {
-    if(!config.isArray) {
-        const path = getPath(name);
+function setValue(state, name, value) {
+    const path = getPath(name);
 
-        if(path.length > 1) {
-            for(let i = 0, length = path.length; i < length; i += 1) {
-                if(typeof path[i] === 'number') {
-                    const array = getIn(state, ['inputs', ...path.slice(0, i)]);
+    for(let i = 0, length = path.length; i < length; i += 1) {
+        if(typeof path[i] === 'number') {
+            const arrayPath = path.slice(0, i);
 
-                    if(array) {
-                        const itemValue = getIn(array, ['items', ...path.slice(i)]);
-
-                        initialValue = itemValue;
-                    }
-
-                    break;
-                }
+            if(!getIn(state, ['values', ...arrayPath])) {
+                state = setIn(state, ['values', ...arrayPath], []);
             }
         }
     }
 
-    const input = getIn(state, ['inputs', name], createEmptyInputState(name, config, initialValue, initialErrors));
-    const errors = validateInput(input, input.isArray ? initialValue : input.value, getFormValues(state));
+    return setIn(state, ['values', ...path], value);
+}
+
+function registerInput(state, name, config, initialErrors) {
+    const input = getIn(state, ['inputs', name], createEmptyInputState(name, config, initialErrors));
+    const errors = validateInput(input, getValue(state, name), state.values);
 
     input.errors = errors.length > 0 ? errors : null;
     input.valid = !errors || errors.length === 0;
@@ -134,8 +108,22 @@ function registerInput(state, name, config, initialValue, initialErrors) {
     return setIn(state, ['inputs', name], input);
 }
 
+function removeInput(state, name, removeValue) {
+    const inputs = Object.assign({}, state.inputs);
+
+    delete inputs[name];
+
+    state = setIn(state, ['inputs'], inputs);
+
+    if(removeValue) {
+        state = setIn(state, ['values', ...getPath(name)], undefined);
+    }
+
+    return state;
+}
+
 function validateArrayInputs(state, name) {
-    const nameRegex = new RegExp(`${name}\\[\\d+\\]`);
+    const nameRegex = new RegExp(`^${name}\\[\\d+\\]`);
 
     let valid = true;
     for(const key in state.inputs) {
@@ -156,18 +144,19 @@ function checkArrayChange(state, touch, inputName) {
     const path = getPath(inputName);
 
     if(path.length > 1) {
-        for(let i = path.length - 2; i >= 0; i -= 1) {
+        for(let i = path.length; i >= 0; i -= 1) {
             if(typeof path[i] === 'number') {
                 const arrayNamePath = path.slice(0, i);
+                const arrayName = arrayNamePath.join('');
 
                 const input = getIn(state, ['inputs', ...arrayNamePath]);
 
                 if(input && input.isArray) {
-                    const allValues = getFormValues(state);
-                    const value = getIn(allValues, arrayNamePath);
+                    const allValues = getIn(state, 'values');
+                    const value = getValue(state, arrayName);
 
                     const errors = validateInput(input, value, allValues);
-                    let valid = (!errors || errors.length === 0) && validateArrayInputs(state, arrayNamePath.join(''));
+                    let valid = (!errors || errors.length === 0) && validateArrayInputs(state, arrayName);
 
                     // const nameRegex = new RegExp(`${arrayNamePath.join('')}\\[\\d+\\]`);
                     //
@@ -205,16 +194,7 @@ function checkArrayChange(state, touch, inputName) {
 function handleInputChange(state, touch, name, value) {
     const input = getIn(state, ['inputs', name]);
 
-    let newValue;
-
-    if(input.isArray) {
-        newValue = getIn(getFormValues(state), getPath(name));
-    }
-    else {
-        newValue = (value === '' && input.initialValue === undefined) ? undefined : value;
-    }
-
-    const errors = validateInput(input, newValue, getFormValues(state));
+    const errors = validateInput(input, value, state.values);
     const valid = !errors || errors.length === 0;
 
     let newState = mergeIn(state, ['inputs', name], {
@@ -223,11 +203,14 @@ function handleInputChange(state, touch, name, value) {
         pristine: false,
         dirty: true,
         touched: touch ? true : input.touched,
-        value: input.isArray ? undefined : newValue,
         asyncErrors: []
     });
 
     newState = checkArrayChange(newState, touch, name);
+
+    if(!input.isArray) {
+        newState = setValue(newState, name, value);
+    }
 
     return newState;
 }
@@ -239,7 +222,7 @@ function handleInputBlur(state, touch, name) {
     let errors = input.errors || [];
 
     if(touch) {
-        errors = validateInput(input, input.value, getFormValues(state));
+        errors = validateInput(input, getValue(state, name), getIn(state, 'values'));
         valid = errors.length === 0;
     }
 
@@ -257,28 +240,6 @@ function handleInputBlur(state, touch, name) {
     return newState;
 }
 
-function handleArrayChange(state, name) {
-    const nameRegex = new RegExp(`^${name}\\[(\\d+)\\]`);
-
-    const array = getIn(state, ['inputs', name]);
-    const arrayPath = getPath(name);
-
-    for(const key in state.inputs) {
-        if(Object.prototype.hasOwnProperty.call(state.inputs, key)) {
-            const match = key.match(nameRegex);
-            if(match) {
-                const input = state.inputs[key];
-                const itemPath = getPath(input.name).slice(arrayPath.length);
-                const itemValue = getIn(array, ['items', ...itemPath]);
-
-                state = setIn(state, ['inputs', input.name, 'value'], itemValue);
-            }
-        }
-    }
-
-    return state;
-}
-
 function handleFormChange(state, validate) {
     let formValid = true;
     let pristine = true;
@@ -291,8 +252,8 @@ function handleFormChange(state, validate) {
 
             let valid;
             if(validate) {
-                const allValues = getFormValues(state);
-                const value = input.isArray ? getIn(allValues, getPath(key)) : input.value;
+                const allValues = getIn(state, 'values');
+                const value = getValue(state, key);
                 const errors = validateInput(input, value, allValues);
                 valid = errors.length === 0;
 
@@ -450,9 +411,10 @@ function arrayPush(state, name, value) {
         throw new Error(`Array ${name} doesn't exist`);
     }
 
+    const items = [].concat(getValue(state, name));
+    items.push(value);
 
-
-    return setIn(state, ['inputs', name, 'items'], value, true);
+    return setValue(state, name, items);
 }
 
 function arrayPop(state, name) {
@@ -462,10 +424,10 @@ function arrayPop(state, name) {
         throw new Error(`Array ${name} doesn't exist`);
     }
 
-    const items = [].concat(input.items);
+    const items = [].concat(getValue(state, name));
     items.pop();
 
-    return setIn(state, ['inputs', name, 'items'], items);
+    return setValue(state, name, items);
 }
 
 function arrayShift(state, name) {
@@ -475,10 +437,10 @@ function arrayShift(state, name) {
         throw new Error(`Array ${name} doesn't exist`);
     }
 
-    const items = [].concat(input.items);
+    const items = [].concat(getValue(state, name));
     items.shift();
 
-    return setIn(state, ['inputs', name, 'items'], items);
+    return setValue(state, name, items);
 }
 
 function arrayUnshift(state, name, value) {
@@ -488,16 +450,73 @@ function arrayUnshift(state, name, value) {
         throw new Error(`Array ${name} doesn't exist`);
     }
 
-    const items = [].concat(input.items);
+    const items = [].concat(getValue(state, name));
     items.unshift(value);
 
-    return setIn(state, ['inputs', name, 'items'], items);
+    return setValue(state, name, items);
+}
+
+function arrayInsert(state, name, index, value) {
+    const input = getIn(state, ['inputs', name]);
+
+    if(!input || !input.isArray) {
+        throw new Error(`Array ${name} doesn't exist`);
+    }
+
+    if(index < 0) {
+        throw new Error('index can\'t be lower than 0');
+    }
+
+    const items = [].concat(getValue(state, name));
+
+    if(index > items.length) {
+        index = items.length;
+    }
+
+    items.splice(index, 0, value);
+
+    return setValue(state, name, items);
+}
+
+function arrayRemove(state, name, index) {
+    const input = getIn(state, ['inputs', name]);
+
+    if(!input || !input.isArray) {
+        throw new Error(`Array ${name} doesn't exist`);
+    }
+
+    if(index < 0) {
+        throw new Error('index can\'t be lower than 0');
+    }
+
+    const items = [].concat(getValue(state, name));
+
+    if(index >= items.length) {
+        throw new Error(`Index ${index} doesn't exist in Array ${name}`);
+    }
+
+    items.splice(index, 1);
+
+    return setValue(state, name, items);
+}
+
+function arrayRemoveAll(state, name) {
+    const input = getIn(state, ['inputs', name]);
+
+    if(!input || !input.isArray) {
+        throw new Error(`Array ${name} doesn't exist`);
+    }
+
+    return setValue(state, name, []);
 }
 
 const reducer = (state, action) => {
     switch(action.type) {
         case constants.REGISTER_INPUT:
             return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue, action.payload.initialErrors));
+
+        case constants.REMOVE_INPUT:
+            return handleFormChange(removeInput(state, action.payload.name));
 
         case constants.INPUT_CHANGE:
             return handleFormChange(handleInputChange(state, action.meta.touch, action.meta.name, action.payload.value), action.meta.touch || !getIn(state, ['inputs', action.meta.name, 'valid']));
@@ -524,16 +543,25 @@ const reducer = (state, action) => {
             return handleFormChange(handleAsyncValidateFinished(state, action.meta.name, action.payload));
 
         case constants.ARRAY_PUSH:
-            return handleFormChange(arrayPush(state, action.meta.name, action.payload.value));
+            return handleFormChange(arrayPush(state, action.meta.name, action.payload.value), true);
 
         case constants.ARRAY_POP:
-            return handleFormChange(arrayPop(state, action.meta.name));
+            return handleFormChange(arrayPop(state, action.meta.name), true);
 
         case constants.ARRAY_SHIFT:
-            return handleFormChange(arrayShift(state, action.meta.name));
+            return handleFormChange(arrayShift(state, action.meta.name), true);
 
         case constants.ARRAY_UNSHIFT:
-            return handleFormChange(handleArrayChange(arrayUnshift(state, action.meta.name, action.payload.value), action.meta.name));
+            return handleFormChange(arrayUnshift(state, action.meta.name, action.payload.value), true);
+
+        case constants.ARRAY_INSERT:
+            return handleFormChange(arrayInsert(state, action.meta.name, action.payload.index, action.payload.value), true);
+
+        case constants.ARRAY_REMOVE:
+            return handleFormChange(arrayRemove(state, action.meta.name, action.payload.index), true);
+
+        case constants.ARRAY_REMOVE_ALL:
+            return handleFormChange(arrayRemoveAll(state, action.meta.name), true);
 
         default:
             return state;

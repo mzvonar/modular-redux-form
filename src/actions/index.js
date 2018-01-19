@@ -122,4 +122,32 @@ export default {
             value
         }
     }),
+    arrayInsert: (form, name, index, value) => ({
+        type: constant.ARRAY_INSERT,
+        meta: {
+            form,
+            name
+        },
+        payload: {
+            index,
+            value
+        }
+    }),
+    arrayRemove: (form, name, index) => ({
+        type: constant.ARRAY_REMOVE,
+        meta: {
+            form,
+            name
+        },
+        payload: {
+            index
+        }
+    }),
+    arrayRemoveAll: (form, name) => ({
+        type: constant.ARRAY_REMOVE_ALL,
+        meta: {
+            form,
+            name
+        }
+    }),
 };

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import getIn from '@mzvonar/getin';
 import isEvent from './../utils/isEvent';
+import getPath from './../utils/getPath';
 import deepEqual from 'deep-equal';
 
 function deleteChildren(object, children) {
@@ -23,11 +24,13 @@ function cleanComponentProps(props) {
     const componentProps = Object.assign({}, props);
 
     const input = componentProps.input;
+    const value = componentProps.value;
 
     deleteChildren(componentProps, [
         'component',
         '_mrf',
         'input',
+        'value',
         'validate',
         'formSubmitted',
         'readOnly',
@@ -37,13 +40,13 @@ function cleanComponentProps(props) {
     const inputProps = {};
 
     if(componentProps.type === 'radio') {
-        inputProps.checked = input.value === componentProps.value;
+        inputProps.checked = value === componentProps.value;
     }
     else if(componentProps.type === 'checkbox') {
-        inputProps.checked = !!input.value;
+        inputProps.checked = !!value;
     }
     else {
-        inputProps.value = (input && input.value) || (!props.input.dirty ? props.initialValue : '') || '';
+        inputProps.value = value || /*(!props.input.dirty ? props.initialValue : '') ||*/ '';
     }
 
     inputProps.id = props.id;
@@ -84,7 +87,7 @@ const ignoreForUpdate = [
     '_mrf'
 ];
 
-class Input extends React.Component {
+class ConnectedInput extends React.Component {
     static get propTypes() {
         return {
             component: PropTypes.oneOfType([PropTypes.func, PropTypes.string]).isRequired,
@@ -201,7 +204,8 @@ function mapStateToProps(state, ownProps) {
 
     return {
         input: getIn(formState, ['inputs', ownProps.name]) || {},
-        initialValue: getIn(formState, ['initialValues', ...ownProps._mrf.getPath(ownProps.name)]),
+        value: getIn(formState, ['values', ...getPath(ownProps.name)]),
+        initialValue: getIn(formState, ['initialValues', ...getPath(ownProps.name)]),
         initialErrors: getIn(formState, ['initialInputErrors', ownProps.name]),
         formSubmitted: getIn(formState, 'submitted', false)
     }
@@ -209,4 +213,4 @@ function mapStateToProps(state, ownProps) {
 
 const mapDispatchToProps = {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Input);
+export default connect(mapStateToProps, mapDispatchToProps)(ConnectedInput);

@@ -23,16 +23,18 @@ function cleanComponentProps(props) {
     const componentProps = Object.assign({}, props);
 
     const input = componentProps.input;
+    const value = componentProps.value;
 
     deleteChildren(componentProps, [
         'component',
         'input',
+        'value',
         '_mrf',
     ]);
 
     const items = [];
-    if(input.items) {
-        for(let i = 0, length = input.items.length; i < length; i += 1) {
+    if(input.name && value) {
+        for(let i = 0, length = value.length; i < length; i += 1) {
             items.push(`${input.name}[${i}]`);
         }
     }
@@ -158,6 +160,7 @@ class ConnectedArray extends React.Component {
             throw new Error('Component must be a fucntion or class');
         }
         else {
+            const bindArray = actionCreator => actionCreator.bind(null, this.props.name);
             return React.createElement(this.props.component, Object.assign(componentProps, {
                 meta: {
                     pristine: this.props.input.pristine,
@@ -170,6 +173,15 @@ class ConnectedArray extends React.Component {
                     asyncValidation: this.props.input.asyncValidation,
                     asyncErrors: this.props.input.asyncErrors,
                     formSubmitted: formSubmitted
+                },
+                actions: {
+                    push: bindArray(this.props._mrf.arrayPush),
+                    pop: bindArray(this.props._mrf.arrayPop),
+                    shift: bindArray(this.props._mrf.arrayShift),
+                    unshift: bindArray(this.props._mrf.arrayUnshift),
+                    insert: bindArray(this.props._mrf.arrayInsert),
+                    remove: bindArray(this.props._mrf.arrayRemove),
+                    removeAll: bindArray(this.props._mrf.arrayRemoveAll),
                 }
             }));
         }
@@ -181,6 +193,7 @@ function mapStateToProps(state, ownProps) {
 
     return {
         input: getIn(formState, ['inputs', ownProps.name]) || {},
+        value: getIn(formState, ['values', ...ownProps.name.split('.')]),
         initialValue: getIn(formState, ['initialValues', ...ownProps.name.split('.')]),
         initialErrors: getIn(formState, ['initialInputErrors', ownProps.name]),
         formSubmitted: getIn(formState, 'submitted', false)
