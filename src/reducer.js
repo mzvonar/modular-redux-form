@@ -5,6 +5,16 @@ import setIn from '@mzvonar/setin';
 import mergeIn from '@mzvonar/mergein';
 import {validateInput} from './validators';
 import getPath from "./utils/getPath";
+import isEvent from './utils/isEvent';
+
+function checkEventAsValue(value, name, message) {
+    if(isEvent(value)) {
+        if(!message) {
+            message = `It looks like you're trying to set an Event object as value to "${name}". Value: `;
+        }
+        console.warn(message, value);
+    }
+}
 
 const isMRFAction = action => (
     action &&
@@ -84,6 +94,8 @@ function getValue(state, name) {
 
 function setValue(state, name, value) {
     const path = getPath(name);
+
+    checkEventAsValue(value, name);
 
     for(let i = 0, length = path.length; i < length; i += 1) {
         if(typeof path[i] === 'number') {
@@ -411,6 +423,8 @@ function arrayPush(state, name, value) {
         throw new Error(`Array ${name} doesn't exist`);
     }
 
+    checkEventAsValue(value, name, `It looks like you're trying to push an Event object to "${name}" array. Value: `);
+
     const items = [].concat(getValue(state, name));
     items.push(value);
 
@@ -450,6 +464,8 @@ function arrayUnshift(state, name, value) {
         throw new Error(`Array ${name} doesn't exist`);
     }
 
+    checkEventAsValue(value, name, `It looks like you're trying to unshift an Event object to "${name}" array. Value: `);
+
     const items = [].concat(getValue(state, name));
     items.unshift(value);
 
@@ -466,6 +482,8 @@ function arrayInsert(state, name, index, value) {
     if(index < 0) {
         throw new Error('index can\'t be lower than 0');
     }
+
+    checkEventAsValue(value, name, `It looks like you're trying to insert an Event object to "${name}" array. Value: `);
 
     const items = [].concat(getValue(state, name));
 
@@ -513,7 +531,7 @@ function arrayRemoveAll(state, name) {
 const reducer = (state, action) => {
     switch(action.type) {
         case constants.REGISTER_INPUT:
-            return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialValue, action.payload.initialErrors));
+            return handleFormChange(registerInput(state, action.payload.name, action.payload.config, action.payload.initialErrors));
 
         case constants.REMOVE_INPUT:
             return handleFormChange(removeInput(state, action.payload.name));
