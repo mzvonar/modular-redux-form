@@ -1,6 +1,9 @@
 let Joi;
 try {
-    Joi = require('joi-browser');
+    const isJoi = require.resolve('joi-browser');
+    if(isJoi) {
+        Joi = require('joi-browser');
+    }
 } catch (er) {
     Joi = null;
 }
