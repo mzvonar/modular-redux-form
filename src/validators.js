@@ -1,12 +1,6 @@
-let Joi;
-try {
-    const isJoi = require.resolve('joi-browser');
-    if(isJoi) {
-        Joi = require('joi-browser');
-    }
-} catch (er) {
-    Joi = null;
-}
+import config from './config';
+
+const Joi = config.joi;
 
 const validators = {
     required: (newValue) => !!( (newValue || newValue === 0) && ((typeof newValue !== 'string' && !Array.isArray(newValue)) || newValue.length !== 0)),

@@ -4,6 +4,7 @@ import Array from './components/Array';
 import reducer from './reducer';
 import actions from './actions';
 import {setGlobalValidators} from './validators';
+import config from './config';
 
 const inputChange = (form, name, value) => actions.inputChange(form, true, name, value);
 const formActions = {
@@ -17,6 +18,10 @@ const formActions = {
     arrayRemoveAll: actions.arrayRemoveAll
 };
 
+function setJoi(joi) {
+    config.joi = joi;
+}
+
 export {
     connectForm,
     propTypes,
@@ -25,5 +30,6 @@ export {
     reducer,
     inputChange,
     formActions,
-    setGlobalValidators
+    setGlobalValidators,
+    setJoi
 };
