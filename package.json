@@ -1,6 +1,6 @@
 {
   "name": "@mzvonar/modular-redux-form",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "React form library",
   "main": "./lib/modular-redux-form.js",
   "module": "./es/index.js",
