@@ -254,6 +254,7 @@ const connectForm = initialConfig => {
                     submitErrorMessages: this.props.formState.submitErrorMessages,
                     submitSuccess: this.props.formState.submitSuccess,
                     submitForm: this.submitForm,
+                    inputChange: this.props.inputChange,
                     initialFormErrors: this.props.formState.initialFormErrors,
                     asyncValidation: this.props.formState.asyncValidation
                 });
