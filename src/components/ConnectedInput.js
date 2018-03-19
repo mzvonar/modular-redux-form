@@ -20,11 +20,11 @@ function deleteChildren(object, children) {
     return deleted;
 }
 
-function cleanComponentProps(props) {
+function cleanComponentProps(value, props) {
     const componentProps = Object.assign({}, props);
 
     const input = componentProps.input;
-    const value = componentProps.value;
+    // const value = componentProps.value;
 
     deleteChildren(componentProps, [
         'component',
@@ -104,6 +104,10 @@ class ConnectedInput extends React.Component {
     constructor(props, context) {
         super(props, context);
 
+        this.state = {
+            value: props.value
+        };
+
         this.onChange = this.onChange.bind(this);
         this.onBlur = this.onBlur.bind(this);
     }
@@ -116,6 +120,14 @@ class ConnectedInput extends React.Component {
         }, this.props.initialValue, this.props.initialErrors);
     }
 
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.value !== this.props.value) {
+            this.setState({
+                value: nextProps.value
+            });
+        }
+    }
+
     componentWillUnmount() {
         this.props._mrf.removeInput(this.props.name);
     }
@@ -124,7 +136,7 @@ class ConnectedInput extends React.Component {
         const nextPropsKeys = Object.keys(nextProps);
         const thisPropsKeys = Object.keys(this.props);
 
-        if(nextPropsKeys.length !== thisPropsKeys.length) {
+        if(nextPropsKeys.length !== thisPropsKeys.length || nextState.value !== this.state.value) {
             return true;
         }
 
@@ -146,7 +158,13 @@ class ConnectedInput extends React.Component {
     // }
 
     onChange(e) {
-        this.props._mrf.inputChange(this.props.name, getValue(e));
+        const value = getValue(e);
+
+        this.setState({
+            value: value
+        });
+
+        this.props._mrf.inputChange(this.props.name, value);
 
         if(this.props.onChange) {
             this.props.onChange(e);
@@ -167,11 +185,9 @@ class ConnectedInput extends React.Component {
 
     render() {
         const formSubmitted = this.props.formSubmitted;
-        let componentProps = cleanComponentProps(this.props);
-        Object.assign(componentProps.input, {
-            onChange: this.onChange,
-            onBlur: this.onBlur,
-        });
+        let componentProps = cleanComponentProps(this.state.value, this.props);
+        componentProps.input.onChange = this.onChange;
+        componentProps.input.onBlur = this.onBlur;
 
 
         if(typeof this.props.component === 'string') {
