@@ -117,6 +117,10 @@ function registerInput(state, name, config, initialErrors) {
     input.errors = errors.length > 0 ? errors : null;
     input.valid = !errors || errors.length === 0;
 
+    if(typeof config.value !== 'undefined') {
+        state = setValue(state, name, config.value);
+    }
+
     return setIn(state, ['inputs', name], input);
 }
 

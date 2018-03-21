@@ -116,7 +116,7 @@ class ConnectedInput extends React.Component {
         this.props._mrf.registerInput(this.props.name, {
             required: this.props.required,
             validate: this.props.validate,
-            value: (this.props.type === 'hidden' && this.props.value) ? this.props.value : undefined
+            value: (this.props.type === 'hidden' && this.props.inputValue) ? this.props.inputValue : undefined
         }, this.props.initialValue, this.props.initialErrors);
     }
 
@@ -125,6 +125,9 @@ class ConnectedInput extends React.Component {
             this.setState({
                 value: nextProps.value
             });
+        }
+        if(this.props.type === 'hidden' && nextProps.inputValue !== this.props.inputValue) {
+            this.props._mrf.inputChange(this.props.name, nextProps.inputValue);
         }
     }
 
@@ -223,6 +226,7 @@ function mapStateToProps(state, ownProps) {
         value: getIn(formState, ['values', ...getPath(ownProps.name)]),
         initialValue: getIn(formState, ['initialValues', ...getPath(ownProps.name)]),
         initialErrors: getIn(formState, ['initialInputErrors', ownProps.name]),
+        inputValue: ownProps.value,
         formSubmitted: getIn(formState, 'submitted', false)
     }
 }
