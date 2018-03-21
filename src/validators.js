@@ -1,7 +1,5 @@
 import config from './config';
 
-const Joi = config.joi;
-
 const validators = {
     required: (newValue) => !!( (newValue || newValue === 0) && ((typeof newValue !== 'string' && !Array.isArray(newValue)) || newValue.length !== 0)),
 };
@@ -28,7 +26,7 @@ export function validateInput(input, value, allValues) {
         let validatorName;
 
         if(validationKey.isJoi) {
-            if(!Joi) {
+            if(!config.Joi) {
                 throw new Error('Validator is Joi schema but Joi module was not found.');
             }
 
@@ -42,7 +40,7 @@ export function validateInput(input, value, allValues) {
 
             let result;
             try {
-                result = Joi.validate(value, validator, {
+                result = config.Joi.validate(value, validator, {
                     context: allValues
                 });
             }
@@ -73,7 +71,7 @@ export function validateInput(input, value, allValues) {
             }
 
             if(validator.isJoi) {
-                if(!Joi) {
+                if(!config.Joi) {
                     throw new Error('Validator is Joi schema but Joi module was not found.');
                 }
 
@@ -85,7 +83,7 @@ export function validateInput(input, value, allValues) {
                 let result;
 
                 try {
-                    result = Joi.validate(value, validator, {
+                    result = config.Joi.validate(value, validator, {
                         context: allValues
                     });
                 }

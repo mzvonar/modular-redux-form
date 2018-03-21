@@ -19,7 +19,7 @@ const formActions = {
 };
 
 function setJoi(joi) {
-    config.joi = joi;
+    config.Joi = joi;
 }
 
 export {
