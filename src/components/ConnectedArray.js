@@ -84,7 +84,6 @@ class ConnectedArray extends React.Component {
     }
 
     componentWillMount() {
-        console.log("this.props.initialValue: ", this.props.initialValue);
         this.props._mrf.registerInput(this.props.name, {
             isArray: true,
             required: this.props.required,
