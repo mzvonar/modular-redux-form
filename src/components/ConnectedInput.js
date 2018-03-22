@@ -112,7 +112,7 @@ class ConnectedInput extends React.Component {
         this.onBlur = this.onBlur.bind(this);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.props._mrf.registerInput(this.props.name, {
             required: this.props.required,
             validate: this.props.validate,
