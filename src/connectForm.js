@@ -117,6 +117,7 @@ const connectForm = initialConfig => {
 
                 this.submitForm = this.submitForm.bind(this);
                 this.asyncValidate = this.asyncValidate.bind(this);
+                this.getFormValues = this.getFormValues.bind(this);
                 this.createComponentProps = this.createComponentProps.bind(this);
             }
 
@@ -170,6 +171,23 @@ const connectForm = initialConfig => {
                 }
             }
 
+            getFormValues() {
+                const inputs = this.props.formState.inputs ? Object.values(this.props.formState.inputs).map(input => input.name) : [];
+                const values = this.props.formState.values;
+
+                if(!values) {
+                    return values;
+                }
+
+                const output = {};
+                for(let i = 0, length = inputs.length; i < length; i += 1) {
+                    const input = inputs[i];
+                    output[input] = values[input];
+                }
+
+                return output;
+            }
+
             submitForm(submitOrEvent) {
                 // if(isEvent(submitOrEvent)) {
                 //     submitOrEvent.preventDefault();
@@ -184,7 +202,7 @@ const connectForm = initialConfig => {
 
                 if(this.props.formState.valid) {
                     const doSubmit = () => {
-                        const data = this.props.formState.values;
+                        const data = this.getFormValues();
 
                         const result = onSubmit(data);
 
@@ -254,7 +272,7 @@ const connectForm = initialConfig => {
                     submitErrorMessages: this.props.formState.submitErrorMessages,
                     submitSuccess: this.props.formState.submitSuccess,
                     submitForm: this.submitForm,
-                    inputChange: this.props.inputChange,
+                    // inputChange: this.props.inputChange,
                     initialFormErrors: this.props.formState.initialFormErrors,
                     asyncValidation: this.props.formState.asyncValidation
                 });
