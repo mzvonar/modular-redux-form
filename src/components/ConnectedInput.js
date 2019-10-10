@@ -46,7 +46,7 @@ function cleanComponentProps(value, props) {
         inputProps.checked = !!value;
     }
     else {
-        inputProps.value = value || /*(!props.input.dirty ? props.initialValue : '') ||*/ '';
+        inputProps.value = typeof value !== 'undefined' ? value : /*(!props.input.dirty ? props.initialValue : '') ||*/ '';
     }
 
     inputProps.id = props.id;
