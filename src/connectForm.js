@@ -260,7 +260,7 @@ const connectForm = initialConfig => {
             }
 
             createComponentProps() {
-                return Object.assign({}, this.props.customProps, {
+                return Object.assign({}, {
                     form: this.props.form,
                     pristine: this.props.formState.pristine,
                     dirty: this.props.formState.dirty,
@@ -272,10 +272,10 @@ const connectForm = initialConfig => {
                     submitErrorMessages: this.props.formState.submitErrorMessages,
                     submitSuccess: this.props.formState.submitSuccess,
                     submitForm: this.submitForm,
-                    // inputChange: this.props.inputChange,
+                    inputChange: this.props.inputChange,
                     initialFormErrors: this.props.formState.initialFormErrors,
                     asyncValidation: this.props.formState.asyncValidation
-                });
+                }, this.props.customProps);
             }
 
             render() {
