@@ -83,7 +83,7 @@ class ConnectedArray extends React.Component {
         super(props, context);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.props._mrf.registerInput(this.props.name, {
             isArray: true,
             required: this.props.required,
@@ -115,7 +115,7 @@ class ConnectedArray extends React.Component {
         return false;
     }
 
-    // componentWillReceiveProps(nextProps) {
+    // UNSAFE_componentWillReceiveProps(nextProps) {
     //     if(this.props.type === 'hidden' && nextProps.value !== this.props.value) {
     //         this.onChange(nextProps.value);
     //     }

@@ -120,7 +120,7 @@ class ConnectedInput extends React.Component {
         }, this.props.initialValue, this.props.initialErrors);
     }
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if(nextProps.value !== this.props.value) {
             this.setState({
                 value: nextProps.value
@@ -154,7 +154,7 @@ class ConnectedInput extends React.Component {
         return false;
     }
 
-    // componentWillReceiveProps(nextProps) {
+    // UNSAFE_componentWillReceiveProps(nextProps) {
     //     if(this.props.type === 'hidden' && nextProps.value !== this.props.value) {
     //         this.onChange(nextProps.value);
     //     }

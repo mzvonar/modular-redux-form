@@ -60,3 +60,4 @@ typings/
 lib/
 es/
 dist/
+package-lock.json

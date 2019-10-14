@@ -121,7 +121,7 @@ const connectForm = initialConfig => {
                 this.createComponentProps = this.createComponentProps.bind(this);
             }
 
-            componentWillMount() {
+            UNSAFE_componentWillMount() {
                 this.props.registerForm({
                     initialValues: config.initialValues || this.props.initialValues,
                     initialFormErrors: config.initialFormErrors || this.props.initialFormErrors,
