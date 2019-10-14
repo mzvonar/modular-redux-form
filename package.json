@@ -41,7 +41,7 @@
   "dependencies": {
     "@mzvonar/getin": "0.0.11",
     "@mzvonar/mergein": "0.1.7",
-    "@mzvonar/setin": "0.0.16",
+    "@mzvonar/setin": "0.0.18",
     "deep-equal": "1.0.1"
   },
   "devDependencies": {
@@ -60,11 +60,11 @@
     "joi": "13.6.0",
     "joi-browser": "10.6.1",
     "mocha": "5.2.0",
-    "prop-types": "15.5.10",
-    "react": "16.2.0",
-    "react-dom": "16.2.0",
-    "react-redux": "5.0.5",
-    "redux": "3.7.1",
+    "prop-types": "^15.5.10",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "react-redux": "7.1.1",
+    "redux": "4.0.4",
     "webpack": "3.11.0"
   },
   "peerDependencies": {

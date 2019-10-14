@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import getIn from '@mzvonar/getin';
+import { mutableSetIn } from '@mzvonar/setin';
 import actions from './actions';
 import isEvent from './utils/isEvent';
 import getPath from './utils/getPath';
@@ -181,8 +183,8 @@ const connectForm = initialConfig => {
 
                 const output = {};
                 for(let i = 0, length = inputs.length; i < length; i += 1) {
-                    const input = inputs[i];
-                    output[input] = values[input];
+                    const path = getPath(inputs[i]);
+                    mutableSetIn(output, path, getIn(values, path));
                 }
 
                 return output;
