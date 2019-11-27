@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import getIn from '@mzvonar/getin';
 import isEvent from './../utils/isEvent';
 import getPath from './../utils/getPath';
-import deepEqual from 'deep-equal';
+import deepEqual from 'react-fast-compare';
 
 function deleteChildren(object, children) {
     let deleted = {};
